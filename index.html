@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsalan Pro Scientific Calculator</title>
+    <style>
+        :root {
+            --primary-pink: #e40876;
+            --secondary-orange: #fb7c14;
+            --bg-black: #000000;
+            --btn-dark: #1c1c1e;
+            --btn-gray: #3a3a3c;
+            --shift-yellow: #ffcc00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: aqua;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 380px;
+            background-color: var(--bg-black);
+            border-radius: 35px;
+            padding: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        /* History Section */
+        .history-panel {
+            height: 80px;
+            overflow-y: auto;
+            color: #888;
+            font-size: 0.9rem;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #222;
+        }
+
+        .history-item { margin-bottom: 5px; }
+        .history-item span { color: var(--secondary-orange); }
+
+        /* Display Area */
+        .display-section {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        #shift-label {
+            color: var(--shift-yellow);
+            font-size: 0.8rem;
+            font-weight: bold;
+            height: 15px;
+            margin-bottom: 5px;
+        }
+
+        #result {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 2.8rem;
+            text-align: right;
+            outline: none;
+        }
+
+        /* Buttons Grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .sci-row {
+            grid-template-columns: repeat(5, 1fr);
+            margin-bottom: 10px;
+        }
+
+        button {
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sci-btn {
+            height: 40px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background-color: var(--btn-dark);
+        }
+
+        .num-btn { background-color: var(--btn-gray); }
+        .op-btn { background-color: var(--secondary-orange); }
+        .action-btn { background-color: #a5a5a5; color: black; }
+        
+        .shift-active { background-color: var(--shift-yellow) !important; color: black !important; }
+
+        button:active { transform: scale(0.9); opacity: 0.8; }
+
+        @media (max-width: 360px) {
+            button { height: 50px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-bottom: 15px; color: #333;">ARSALAN : ULTIMATE 600+</h2>
+
+    <div class="calculator">
+        <div id="history" class="history-panel">ہسٹری خالی ہے</div>
+
+        <div class="display-section">
+            <div id="shift-label"></div>
+            <input type="text" id="result" placeholder="0" readonly>
+        </div>
+
+        <div class="buttons sci-row">
+            <button class="sci-btn" id="shift-key" onclick="toggleShift()">Shift</button>
+            <button class="sci-btn" onclick="applyMath('sin')" id="f-sin">sin</button>
+            <button class="sci-btn" onclick="applyMath('cos')" id="f-cos">cos</button>
+            <button class="sci-btn" onclick="applyMath('tan')" id="f-tan">tan</button>
+            <button class="sci-btn" onclick="insert('Math.PI')">π</button>
+            
+            <button class="sci-btn" onclick="applyMath('log')" id="f-log">log</button>
+            <button class="sci-btn" onclick="insert('**')">xʸ</button>
+            <button class="sci-btn" onclick="applyMath('sqrt')" id="f-sqrt">√</button>
+            <button class="sci-btn" onclick="insert('Math.E')">e</button>
+            <button class="sci-btn" onclick="applyMath('abs')">|x|</button>
+        </div>
+
+        <div class="buttons">
+            <button class="action-btn" onclick="allClear()">AC</button>
+            <button class="action-btn" onclick="backspace()">DEL</button>
+            <button class="action-btn" onclick="insert('%')">%</button>
+            <button class="op-btn" onclick="insert('/')">÷</button>
+
+            <button class="num-btn" onclick="insert('7')">7</button>
+            <button class="num-btn" onclick="insert('8')">8</button>
+            <button class="num-btn" onclick="insert('9')">9</button>
+            <button class="op-btn" onclick="insert('*')">×</button>
+
+            <button class="num-btn" onclick="insert('4')">4</button>
+            <button class="num-btn" onclick="insert('5')">5</button>
+            <button class="num-btn" onclick="insert('6')">6</button>
+            <button class="op-btn" onclick="insert('-')">−</button>
+
+            <button class="num-btn" onclick="insert('1')">1</button>
+            <button class="num-btn" onclick="insert('2')">2</button>
+            <button class="num-btn" onclick="insert('3')">3</button>
+            <button class="op-btn" onclick="insert('+')">+</button>
+
+            <button class="num-btn" onclick="insert('0')" style="grid-column: span 2; border-radius: 30px;">0</button>
+            <button class="num-btn" onclick="insert('.')">.</button>
+            <button class="op-btn" style="background-color: var(--primary-pink);" onclick="solve()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('result');
+        let historyPanel = document.getElementById('history');
+        let isShift = false;
+
+        function toggleShift() {
+            isShift = !isShift;
+            document.getElementById('shift-key').classList.toggle('shift-active');
+            document.getElementById('shift-label').innerText = isShift ? "S" : "";
+            
+            document.getElementById('f-sin').innerText = isShift ? 'asin' : 'sin';
+            document.getElementById('f-cos').innerText = isShift ? 'acos' : 'cos';
+            document.getElementById('f-tan').innerText = isShift ? 'atan' : 'tan';
+            document.getElementById('f-log').innerText = isShift ? 'ln' : 'log';
+            document.getElementById('f-sqrt').innerText = isShift ? '∛' : '√';
+        }
+
+        function insert(val) { display.value += val; }
+        function allClear() { display.value = ''; }
+        function backspace() { display.value = display.value.slice(0, -1); }
+
+        function applyMath(type) {
+            let val = eval(display.value) || 0;
+            let res = 0;
+            try {
+                if (!isShift) {
+                    if (type === 'sin') res = Math.sin(val * Math.PI / 180);
+                    if (type === 'cos') res = Math.cos(val * Math.PI / 180);
+                    if (type === 'tan') res = Math.tan(val * Math.PI / 180);
+                    if (type === 'log') res = Math.log10(val);
+                    if (type === 'sqrt') res = Math.sqrt(val);
+                    if (type === 'abs') res = Math.abs(val);
+                } else {
+                    if (type === 'sin') res = Math.asin(val) * 180 / Math.PI;
+                    if (type === 'cos') res = Math.acos(val) * 180 / Math.PI;
+                    if (type === 'tan') res = Math.atan(val) * 180 / Math.PI;
+                    if (type === 'log') res = Math.log(val);
+                    if (type === 'sqrt') res = Math.cbrt(val);
+                    toggleShift();
+                }
+                addToHistory(type + "(" + val + ")", res.toFixed(4));
+                display.value = parseFloat(res.toFixed(8));
+            } catch { display.value = "Error"; }
+        }
+
+        function solve() {
+            try {
+                let expression = display.value;
+                let answer = eval(expression);
+                let finalAnswer = parseFloat(answer.toFixed(8));
+                addToHistory(expression, finalAnswer);
+                display.value = finalAnswer;
+            } catch { display.value = "Error"; }
+        }
+
+        function addToHistory(exp, ans) {
+            if (historyPanel.innerText.includes("خالی")) historyPanel.innerHTML = "";
+            let item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `${exp} = <span>${ans}</span>`;
+            historyPanel.prepend(item);
+        }
+    </script>
+</body>
+</html>
